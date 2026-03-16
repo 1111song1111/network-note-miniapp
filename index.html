@@ -2,73 +2,403 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>ネットワークノート</title>
   <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto;max-width:720px;margin:0 auto;padding:16px;}
-    #log{border:1px solid #ddd;border-radius:12px;padding:12px;height:65vh;overflow:auto;background:#fafafa;}
-    .row{display:flex;gap:8px;margin-top:12px;}
-    input{flex:1;padding:12px;border-radius:10px;border:1px solid #ddd;font-size:16px;}
-    button{padding:12px 14px;border-radius:10px;border:1px solid #ddd;background:#fff;font-size:16px;}
-    .msg{margin:10px 0;display:flex;}
-    .me{justify-content:flex-end;}
-    .ai{justify-content:flex-start;}
-    .bubble{max-width:80%;padding:10px 12px;border-radius:14px;white-space:pre-wrap;word-break:break-word;}
-    .me .bubble{background:#dff7e8;border:1px solid #bfead2;}
-    .ai .bubble{background:#fff;border:1px solid #e5e5e5;}
-    .hint{color:#666;font-size:12px;margin:8px 2px;}
+    :root{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --border:#e6e8f0;
+      --text:#111827;
+      --muted:#6b7280;
+      --me:#dff7e8;
+      --meBorder:#bfead2;
+      --ai:#ffffff;
+      --aiBorder:#e6e8f0;
+      --btn:#111827;
+      --btnText:#ffffff;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .wrap{
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 14px 14px calc(14px + env(safe-area-inset-bottom));
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:10px;
+    }
+
+    .title{
+      display:flex; flex-direction:column; gap:2px;
+    }
+    .title h1{
+      font-size:18px; margin:0; line-height:1.2;
+    }
+    .title .sub{
+      font-size:12px; color:var(--muted);
+    }
+
+    .actions{
+      display:flex; gap:8px;
+    }
+    .ghost{
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.7);
+      padding:8px 10px;
+      border-radius:10px;
+      font-size:13px;
+      cursor:pointer;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:16px;
+      overflow:hidden;
+      box-shadow: 0 8px 22px rgba(17,24,39,.06);
+    }
+
+    .log{
+      height: 62vh;
+      overflow:auto;
+      padding: 14px;
+      background: linear-gradient(180deg, rgba(246,247,251,0.5), rgba(246,247,251,0));
+    }
+
+    .row{
+      display:flex;
+      gap:10px;
+      padding: 12px;
+      border-top: 1px solid var(--border);
+      background: rgba(255,255,255,.85);
+      backdrop-filter: blur(6px);
+    }
+
+    textarea{
+      flex:1;
+      resize:none;
+      min-height:44px;
+      max-height:120px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      outline:none;
+      font-size:15px;
+      line-height:1.4;
+      background:#fff;
+    }
+
+    .send{
+      border:none;
+      background:var(--btn);
+      color:var(--btnText);
+      padding:10px 14px;
+      border-radius:12px;
+      font-size:14px;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+    .send:disabled{
+      opacity:.5; cursor:not-allowed;
+    }
+
+    .msg{
+      display:flex;
+      margin: 10px 0;
+      gap:8px;
+      align-items:flex-end;
+    }
+    .msg.me{justify-content:flex-end}
+    .msg.ai{justify-content:flex-start}
+
+    .avatar{
+      width:28px; height:28px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#fff;
+      display:flex; align-items:center; justify-content:center;
+      font-size:14px;
+      color:var(--muted);
+      flex:0 0 auto;
+    }
+
+    .bubble{
+      max-width: 78%;
+      border-radius: 16px;
+      padding: 10px 12px;
+      border: 1px solid var(--aiBorder);
+      background: var(--ai);
+      white-space:pre-wrap;
+      word-break:break-word;
+      line-height:1.5;
+      font-size:15px;
+    }
+
+    .me .bubble{
+      background: var(--me);
+      border-color: var(--meBorder);
+      border-bottom-right-radius: 6px;
+    }
+    .ai .bubble{
+      border-bottom-left-radius: 6px;
+    }
+
+    .meta{
+      margin-top:6px;
+      font-size:11px;
+      color:var(--muted);
+      display:flex;
+      gap:8px;
+    }
+
+    .typing{
+      display:inline-flex;
+      gap:4px;
+      align-items:center;
+      padding:10px 12px;
+      border-radius:16px;
+      border:1px solid var(--aiBorder);
+      background:var(--ai);
+      max-width: 78%;
+    }
+    .dot{
+      width:6px;height:6px;border-radius:999px;background:#c7cbd6;
+      animation: bounce 1.2s infinite ease-in-out;
+    }
+    .dot:nth-child(2){animation-delay:.15s}
+    .dot:nth-child(3){animation-delay:.3s}
+    @keyframes bounce{
+      0%,80%,100%{transform:translateY(0);opacity:.6}
+      40%{transform:translateY(-4px);opacity:1}
+    }
+
+    .hint{
+      font-size:12px;color:var(--muted);
+      padding:10px 12px;
+      border-top:1px solid var(--border);
+      background:#fff;
+    }
+
+    @media (max-width: 420px){
+      .log{height: 60vh}
+      .bubble{max-width: 86%}
+    }
   </style>
 </head>
 <body>
-  <h3>ネットワークノート</h3>
-  <div class="hint">まずはテスト用（疑似返信）。次にAI接続します。</div>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="title">
+        <h1>ネットワークノート</h1>
+        <div class="sub">テスト版（AI未接続）・会話はこの端末に保存されます</div>
+      </div>
+      <div class="actions">
+        <button class="ghost" id="btnReset">清空</button>
+      </div>
+    </div>
 
-  <div id="log"></div>
-
-  <div class="row">
-    <input id="t" placeholder="入力して送信…" />
-    <button id="btn">送信</button>
+    <div class="card">
+      <div id="log" class="log"></div>
+      <div class="hint">Enterで送信 / Shift+Enterで改行</div>
+      <div class="row">
+        <textarea id="t" placeholder="入力して送信…"></textarea>
+        <button id="btn" class="send" disabled>送信</button>
+      </div>
+    </div>
   </div>
 
   <script>
-    const log = document.getElementById('log');
-    const input = document.getElementById('t');
-    const btn = document.getElementById('btn');
+    const STORAGE_KEY = "network_note_chat_v1";
 
-    function add(role, text){
-      const wrap = document.createElement('div');
-      wrap.className = 'msg ' + role;
-      const bubble = document.createElement('div');
-      bubble.className = 'bubble';
-      bubble.textContent = text;
-      wrap.appendChild(bubble);
-      log.appendChild(wrap);
+    const log = document.getElementById("log");
+    const ta = document.getElementById("t");
+    const btn = document.getElementById("btn");
+    const btnReset = document.getElementById("btnReset");
+
+    function nowHHMM(){
+      const d = new Date();
+      const hh = String(d.getHours()).padStart(2,"0");
+      const mm = String(d.getMinutes()).padStart(2,"0");
+      return `${hh}:${mm}`;
+    }
+
+    function loadHistory(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return [];
+        const data = JSON.parse(raw);
+        return Array.isArray(data) ? data : [];
+      }catch(e){
+        return [];
+      }
+    }
+
+    function saveHistory(items){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    }
+
+    let history = loadHistory();
+
+    function renderAll(){
+      log.innerHTML = "";
+      for(const m of history){
+        addMsg(m.role, m.text, m.time, false);
+      }
+      scrollToBottom();
+    }
+
+    function scrollToBottom(){
       log.scrollTop = log.scrollHeight;
     }
 
-    function fakeReply(text){
-      const replies = [
+    function addMsg(role, text, time = nowHHMM(), persist = true){
+      const wrap = document.createElement("div");
+      wrap.className = "msg " + role;
+
+      if(role === "ai"){
+        const av = document.createElement("div");
+        av.className = "avatar";
+        av.textContent = "N";
+        wrap.appendChild(av);
+      }
+
+      const bubbleWrap = document.createElement("div");
+
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+      bubble.textContent = text;
+
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      meta.textContent = time;
+
+      bubbleWrap.appendChild(bubble);
+      bubbleWrap.appendChild(meta);
+      wrap.appendChild(bubbleWrap);
+
+      if(role === "me"){
+        const av = document.createElement("div");
+        av.className = "avatar";
+        av.textContent = "你";
+        wrap.appendChild(av);
+      }
+
+      log.appendChild(wrap);
+      scrollToBottom();
+
+      if(persist){
+        history.push({ role, text, time });
+        saveHistory(history);
+      }
+    }
+
+    let typingEl = null;
+    function showTyping(){
+      if(typingEl) return;
+      const wrap = document.createElement("div");
+      wrap.className = "msg ai";
+
+      const av = document.createElement("div");
+      av.className = "avatar";
+      av.textContent = "N";
+
+      const typing = document.createElement("div");
+      typing.className = "typing";
+      typing.innerHTML = '<span class="dot"></span><span class="dot"></span><span class="dot"></span>';
+
+      wrap.appendChild(av);
+      wrap.appendChild(typing);
+      log.appendChild(wrap);
+      typingEl = wrap;
+      scrollToBottom();
+    }
+
+    function hideTyping(){
+      if(typingEl){
+        typingEl.remove();
+        typingEl = null;
+      }
+    }
+
+    function fakeReply(userText){
+      const pool = [
         "うん、聞いてるよ。",
-        "それは大変だったね…。もう少し詳しく教えて？",
-        "そばにいるよ。深呼吸しよ。",
-        "今日、少しでも楽だった瞬間はあった？"
+        "それは大変だったね…。少し休もうか。",
+        "今の気持ちを、もう少し言葉にしてみて？",
+        "大丈夫。ここではあなたのペースでいいよ。",
+        "今日いちばん疲れたのは、どの場面？"
       ];
-      const r = replies[Math.floor(Math.random()*replies.length)];
-      return r + "\n（あなたの言葉）" + text;
+      const r = pool[Math.floor(Math.random() * pool.length)];
+      return r + "\n\n（あなた）" + userText;
+    }
+
+    function setButtonState(){
+      btn.disabled = ta.value.trim().length === 0;
+    }
+
+    function autosize(){
+      ta.style.height = "auto";
+      ta.style.height = Math.min(ta.scrollHeight, 120) + "px";
     }
 
     function send(){
-      const v = input.value.trim();
+      const v = ta.value.trim();
       if(!v) return;
-      input.value = "";
-      add("me", v);
-      setTimeout(()=>add("ai", fakeReply(v)), 250);
+      ta.value = "";
+      autosize();
+      setButtonState();
+
+      addMsg("me", v);
+
+      showTyping();
+      setTimeout(() => {
+        hideTyping();
+        addMsg("ai", fakeReply(v));
+      }, 450);
     }
 
-    btn.addEventListener('click', send);
-    input.addEventListener('keydown', (e)=>{ if(e.key==="Enter") send(); });
+    btn.addEventListener("click", send);
 
-    add("ai","こんにちは。ネットワークノートへようこそ。今日はどうしたの？");
+    ta.addEventListener("input", () => {
+      autosize();
+      setButtonState();
+    });
+
+    ta.addEventListener("keydown", (e) => {
+      if(e.key === "Enter" && !e.shiftKey){
+        e.preventDefault();
+        send();
+      }
+    });
+
+    btnReset.addEventListener("click", () => {
+      if(!confirm("聊天记录会被清空，确定吗？")) return;
+      history = [];
+      saveHistory(history);
+      renderAll();
+      addMsg("ai", "履歴を消したよ。改めて、今日はどうしたの？");
+    });
+
+    // 初次欢迎 & 恢复历史
+    renderAll();
+    if(history.length === 0){
+      addMsg("ai", "こんにちは。ネットワークノートへようこそ。今日はどうしたの？");
+    }
+    autosize();
+    setButtonState();
   </script>
 </body>
 </html>
