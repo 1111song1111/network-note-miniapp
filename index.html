@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ネットワークノート</title>
+  <style>
+    body{font-family:system-ui;max-width:720px;margin:0 auto;padding:16px;}
+    #log{border:1px solid #ddd;border-radius:12px;padding:12px;height:60vh;overflow:auto;background:#fafafa;}
+    .row{display:flex;gap:8px;margin-top:12px;}
+    input{flex:1;padding:12px;border-radius:10px;border:1px solid #ddd;}
+    button{padding:12px 14px;border-radius:10px;border:1px solid #ddd;background:#fff;}
+  </style>
+</head>
+<body>
+  <h3>ネットワークノート（测试页）</h3>
+  <div id="log"></div>
+  <div class="row">
+    <input id="t" placeholder="输入一句话…" />
+    <button onclick="send()">发送</button>
+  </div>
+
+  <script>
+    const log = document.getElementById('log');
+    function add(who, txt){
+      const d=document.createElement('div');
+      d.textContent = who + '：' + txt;
+      d.style.margin='10px 0';
+      log.appendChild(d);
+      log.scrollTop = log.scrollHeight;
+    }
+    function send(){
+      const t=document.getElementById('t');
+      const v=t.value.trim();
+      if(!v) return;
+      t.value='';
+      add('我', v);
+      setTimeout(()=>add('TA','我在呢～你说：'+v), 200);
+    }
+  </script>
+</body>
+</html>
