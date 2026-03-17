@@ -145,11 +145,11 @@
       align-items:flex-end;
     }
 
-    /* 2) 不自动放大：固定高度，不做 autosize */
+    /* 不自动放大：固定高度 */
     textarea{
       flex:1;
       resize:none;
-      height: 46px;         /* 固定高度 */
+      height: 46px;
       padding:10px 12px;
       border-radius:14px;
       border:1.5px solid rgba(255,127,176,.35);
@@ -183,6 +183,7 @@
       margin: 10px 0;
       gap:8px;
       align-items:flex-end;
+      width:100%;
     }
     .msg.me{justify-content:flex-end}
     .msg.ai{justify-content:flex-start}
@@ -199,7 +200,15 @@
       box-shadow: 0 6px 14px rgba(255,127,176,.10);
     }
 
-    .bubbleWrap{display:flex;flex-direction:column;}
+    /* ✅关键修复：bubbleWrap 不再“按内容收缩”，而是占满一行 */
+    .bubbleWrap{
+      display:flex;
+      flex-direction:column;
+      width:100%;
+    }
+    .msg.me .bubbleWrap{ align-items:flex-end; }
+    .msg.ai .bubbleWrap{ align-items:flex-start; }
+
     .bubble{
       border-radius: 18px;
       padding: 10px 12px;
@@ -210,22 +219,24 @@
       line-height:1.55;
       font-size:15px;
       box-shadow: 0 6px 14px rgba(17,24,39,.04);
-      max-width: 86%;
-      width: fit-content;
       display:block;
     }
 
-    /* 1) 我方气泡：更宽，短句不会“缩成一小坨” */
-    .me .bubble{
+    /* ✅关键修复：我方气泡用 clamp 强制更宽（短句也不会变小块） */
+    .msg.me .bubble{
       background: var(--me);
       border-color: var(--meBorder);
       border-bottom-right-radius: 8px;
+
+      width: clamp(240px, 72%, 560px);  /* ←核心：最小240px，最多560px */
       max-width: 92%;
-      min-width: 68%;   /* 关键：明显更宽 */
       text-align:left;
     }
-    .ai .bubble{
+
+    /* 对方气泡也稍微大一点，但不需要固定那么宽 */
+    .msg.ai .bubble{
       border-bottom-left-radius: 8px;
+      width: fit-content;
       max-width: 88%;
     }
 
@@ -236,6 +247,11 @@
       display:flex;
       gap:8px;
       padding-left:2px;
+      width: clamp(240px, 72%, 560px);
+      justify-content:flex-start;
+    }
+    .msg.ai .meta{
+      width:auto;
     }
 
     .typing{
@@ -262,8 +278,7 @@
 
     @media (max-width: 420px){
       .log{height: 60vh}
-      .me .bubble{min-width: 74%;}
-      .bubble{max-width: 92%;}
+      .msg.me .bubble{ width: clamp(220px, 80%, 520px); }
     }
   </style>
 </head>
@@ -385,7 +400,6 @@
 
     function renderAll(){
       log.querySelectorAll(".msg").forEach(n => n.remove());
-      // 保留 sakuraLayer
       for(const m of history){
         addMsg(m.role, m.text, m.time, false);
       }
@@ -416,10 +430,8 @@
       if(typingEl){ typingEl.remove(); typingEl = null; }
     }
 
-    // 亲密度：基础 + 关键词加成
     function bumpAff(userText){
       let add = 1;
-
       const t = (userText || "").toLowerCase();
       const hot = [
         "好き","すき","love","喜欢",
@@ -427,18 +439,16 @@
         "かわいい","可爱","cute",
         "おやすみ","晚安","ねる",
         "寂","さみ","lonely",
-        "ぎゅ","抱","キス","ちゅ" // 仅加分，不做露骨输出
+        "ぎゅ","抱","キス","ちゅ"
       ];
       if(hot.some(k => t.includes(k.toLowerCase()))) add += 2;
-
-      if(t.length >= 30) add += 1; // 认真说话加一点
+      if(t.length >= 30) add += 1;
 
       affection += add;
       affEl.textContent = affection;
       saveAff(affection);
     }
 
-    // 樱花飘落：每次发送生成少量花瓣
     function sakuraFall(intensity = 10){
       const width = log.clientWidth;
       const durationBase = 2400;
@@ -459,12 +469,10 @@
         p.style.animationDelay = delay + "ms, 0ms";
 
         sakuraLayer.appendChild(p);
-
         setTimeout(() => { p.remove(); }, dur + delay + 200);
       }
     }
 
-    // 暧昧关键词回复（保持心动但不露骨）
     function keywordReply(userText){
       const t = (userText || "").toLowerCase();
       const rules = [
@@ -487,11 +495,6 @@
           "その言葉、反則。…もっと聞かせて？",
           "好きって言われると、こっちまで溶けそう。",
           "私も、あなたのこと…大事にしたい。"
-        ]},
-        { keys:["仕事","しごと","バイト","work"], replies:[
-          "仕事の話、聞きたい。あなたの頑張り、ちゃんと知りたい。",
-          "今日いちばん疲れたのはどこ？私、味方でいたい。",
-          "えらい。まずは一息。私が一番に褒めるね。"
         ]},
         { keys:["おやす","晚安","sleep","ねる"], replies:[
           "おやすみ。今日もよく頑張ったね。…最後に、ぎゅ。",
@@ -540,16 +543,14 @@
     }
 
     function send(){
-      const raw = ta.value;
-      const v = raw.trim();
+      const v = ta.value.trim();
       if(!v) return;
 
-      ta.value = "";               // 清空
+      ta.value = "";
       setButtonState();
 
       addMsg("me", v);
 
-      // 4) 发送后樱花飘落 + 亲密度
       bumpAff(v);
       sakuraFall(12);
 
@@ -557,7 +558,6 @@
       setTimeout(() => {
         hideTyping();
         addMsg("ai", composeReply(v));
-        // AI 回复后也轻微加一点亲密度 + 少量樱花
         affection += 1;
         affEl.textContent = affection;
         saveAff(affection);
@@ -566,11 +566,7 @@
     }
 
     btn.addEventListener("click", send);
-
-    ta.addEventListener("input", () => {
-      setButtonState();
-    });
-
+    ta.addEventListener("input", setButtonState);
     ta.addEventListener("keydown", (e) => {
       if(e.key === "Enter" && !e.shiftKey){
         e.preventDefault();
@@ -586,7 +582,6 @@
       addMsg("ai", "履歴を消したよ。…もう一回、最初から。今日はどうしたの？");
     });
 
-    // 初回/復元
     renderAll();
     if(history.length === 0){
       addMsg("ai", "こんにちは。…会いに来てくれて嬉しい。\n今日はどんな気分？");
