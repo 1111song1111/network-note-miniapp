@@ -2,7 +2,8 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <!-- ✅关键：禁止页面缩放 + 适配刘海 -->
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
   <title>ネットワークノート</title>
   <style>
     :root{
@@ -19,7 +20,6 @@
       --aiBorder:#f3c7d7;
 
       --accent:#ff7fb0;
-      --accent2:#ffb6d1;
       --shadow: 0 10px 26px rgba(255,127,176,.18);
     }
     *{box-sizing:border-box}
@@ -111,13 +111,11 @@
       width:14px; height:10px;
       background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.9), rgba(255,182,209,.95) 45%, rgba(255,127,176,.85));
       border-radius: 70% 30% 70% 30%;
-      transform: rotate(20deg);
       opacity:.95;
       filter: drop-shadow(0 6px 10px rgba(255,127,176,.18));
       animation-name: fall, sway;
       animation-timing-function: linear, ease-in-out;
       animation-iteration-count: 1, infinite;
-      will-change: transform, top, left, opacity;
     }
     @keyframes fall{
       0%{transform:translateY(0) rotate(0deg); opacity:0.95}
@@ -145,16 +143,16 @@
       align-items:flex-end;
     }
 
-    /* 不自动放大：固定高度 */
+    /* ✅关键：iPhone 防缩放：输入框字体 >= 16px */
     textarea{
       flex:1;
       resize:none;
-      height: 46px;
+      height: 46px;               /* 固定高度，不自动变高 */
       padding:10px 12px;
       border-radius:14px;
       border:1.5px solid rgba(255,127,176,.35);
       outline:none;
-      font-size:15px;
+      font-size:16px;             /* ←从15改为16，避免聚焦时缩放 */
       line-height:1.4;
       background: rgba(255, 245, 249, .95);
       box-shadow: inset 0 1px 0 rgba(255,255,255,.8);
@@ -200,14 +198,10 @@
       box-shadow: 0 6px 14px rgba(255,127,176,.10);
     }
 
-    /* ✅关键修复：bubbleWrap 不再“按内容收缩”，而是占满一行 */
-    .bubbleWrap{
-      display:flex;
-      flex-direction:column;
-      width:100%;
-    }
-    .msg.me .bubbleWrap{ align-items:flex-end; }
-    .msg.ai .bubbleWrap{ align-items:flex-start; }
+    /* bubbleWrap 不收缩 */
+    .bubbleWrap{display:flex; flex-direction:column; width:100%;}
+    .msg.me .bubbleWrap{align-items:flex-end;}
+    .msg.ai .bubbleWrap{align-items:flex-start;}
 
     .bubble{
       border-radius: 18px;
@@ -222,21 +216,18 @@
       display:block;
     }
 
-    /* ✅关键修复：我方气泡用 clamp 强制更宽（短句也不会变小块） */
+    /* 我方气泡更宽 */
     .msg.me .bubble{
       background: var(--me);
       border-color: var(--meBorder);
       border-bottom-right-radius: 8px;
-
-      width: clamp(240px, 72%, 560px);  /* ←核心：最小240px，最多560px */
+      width: clamp(240px, 72%, 560px);
       max-width: 92%;
       text-align:left;
     }
 
-    /* 对方气泡也稍微大一点，但不需要固定那么宽 */
     .msg.ai .bubble{
       border-bottom-left-radius: 8px;
-      width: fit-content;
       max-width: 88%;
     }
 
@@ -244,15 +235,10 @@
       margin-top:6px;
       font-size:11px;
       color:var(--muted);
-      display:flex;
-      gap:8px;
       padding-left:2px;
       width: clamp(240px, 72%, 560px);
-      justify-content:flex-start;
     }
-    .msg.ai .meta{
-      width:auto;
-    }
+    .msg.ai .meta{width:auto}
 
     .typing{
       display:inline-flex;
@@ -278,7 +264,8 @@
 
     @media (max-width: 420px){
       .log{height: 60vh}
-      .msg.me .bubble{ width: clamp(220px, 80%, 520px); }
+      .msg.me .bubble{width: clamp(220px, 80%, 520px);}
+      textarea{font-size:16px;}
     }
   </style>
 </head>
@@ -311,8 +298,8 @@
   </div>
 
   <script>
-    const STORAGE_KEY = "network_note_chat_v3";
-    const AFF_KEY = "network_note_aff_v1";
+    const STORAGE_KEY = "network_note_chat_v4";
+    const AFF_KEY = "network_note_aff_v2";
 
     const log = document.getElementById("log");
     const sakuraLayer = document.getElementById("sakuraLayer");
@@ -352,9 +339,7 @@
     let affection = loadAff();
     affEl.textContent = affection;
 
-    function scrollToBottom(){
-      log.scrollTop = log.scrollHeight;
-    }
+    function scrollToBottom(){ log.scrollTop = log.scrollHeight; }
 
     function addMsg(role, text, time = nowHHMM(), persist = true){
       const wrap = document.createElement("div");
@@ -411,38 +396,42 @@
       if(typingEl) return;
       const wrap = document.createElement("div");
       wrap.className = "msg ai";
-
       const av = document.createElement("div");
       av.className = "avatar";
       av.textContent = "N";
-
       const typing = document.createElement("div");
       typing.className = "typing";
       typing.innerHTML = '<span class="dot"></span><span class="dot"></span><span class="dot"></span>';
-
       wrap.appendChild(av);
       wrap.appendChild(typing);
       log.appendChild(wrap);
       typingEl = wrap;
       scrollToBottom();
     }
-    function hideTyping(){
-      if(typingEl){ typingEl.remove(); typingEl = null; }
-    }
+    function hideTyping(){ if(typingEl){ typingEl.remove(); typingEl = null; } }
 
-    function bumpAff(userText){
-      let add = 1;
-      const t = (userText || "").toLowerCase();
-      const hot = [
+    /* ✅暧昧判定：只有命中这些才涨亲密度/飘樱花 */
+    function isFlirty(text){
+      const t = (text || "").toLowerCase();
+      const keys = [
         "好き","すき","love","喜欢",
         "会いたい","あいたい","miss","想你",
         "かわいい","可爱","cute",
-        "おやすみ","晚安","ねる",
+        "おやすみ","晚安",
         "寂","さみ","lonely",
-        "ぎゅ","抱","キス","ちゅ"
+        "ぎゅ","抱","ちゅ","キス",
+        "ドキドキ","心动","ときめ"
       ];
-      if(hot.some(k => t.includes(k.toLowerCase()))) add += 2;
-      if(t.length >= 30) add += 1;
+      return keys.some(k => t.includes(k.toLowerCase()));
+    }
+
+    function bumpAff(userText){
+      // 只在暧昧时触发
+      if(!isFlirty(userText)) return;
+
+      let add = 2; // 暧昧起步就多一点
+      const t = (userText || "").toLowerCase();
+      if(t.length >= 20) add += 1;
 
       affection += add;
       affEl.textContent = affection;
@@ -452,7 +441,6 @@
     function sakuraFall(intensity = 10){
       const width = log.clientWidth;
       const durationBase = 2400;
-
       for(let i=0;i<intensity;i++){
         const p = document.createElement("div");
         p.className = "petal";
@@ -469,35 +457,30 @@
         p.style.animationDelay = delay + "ms, 0ms";
 
         sakuraLayer.appendChild(p);
-        setTimeout(() => { p.remove(); }, dur + delay + 200);
+        setTimeout(() => p.remove(), dur + delay + 200);
       }
     }
 
     function keywordReply(userText){
       const t = (userText || "").toLowerCase();
       const rules = [
-        { keys:["疲","つか","しんど","だる","累","tired"], replies:[
-          "おつかれさま。…よしよし。今日は私に甘えていいよ。",
-          "頑張ったね。今だけは、私の声でほどけて。",
-          "その疲れ、少しだけ私に預けて？深呼吸、いっしょに。"
-        ]},
-        { keys:["寂","さみ","さび","lonely"], replies:[
-          "寂しいって言ってくれて嬉しい。今は私がここにいるよ。",
-          "ぎゅーってしたい。…気持ちは届く？",
-          "今日は私があなたの味方。離れない。"
-        ]},
         { keys:["想你","会いた","あいた","会いたい","miss"], replies:[
-          "会いたいって、ずるい。胸がきゅってなるじゃん。",
+          "会えない分、声で近づいてもいい？",
           "私も会いたい。…いま、あなたのこと考えてた。",
-          "会えない分、声で近づいてもいい？"
+          "会いたいって、ずるい。胸がきゅってなる。"
         ]},
         { keys:["好き","すき","love","喜欢"], replies:[
           "その言葉、反則。…もっと聞かせて？",
           "好きって言われると、こっちまで溶けそう。",
           "私も、あなたのこと…大事にしたい。"
         ]},
-        { keys:["おやす","晚安","sleep","ねる"], replies:[
-          "おやすみ。今日もよく頑張ったね。…最後に、ぎゅ。",
+        { keys:["かわい","可爱","cute"], replies:[
+          "あなたに言われるのがいちばん嬉しい。照れる…。",
+          "じゃあ、あなたは？私から見たらずっと可愛いよ。",
+          "その褒め方、心に残る。責任とって？"
+        ]},
+        { keys:["おやす","晚安"], replies:[
+          "おやすみ。最後に…ぎゅ。",
           "眠る前に、私のこと少しだけ思い出して？",
           "夢で会えたら、こっそり手をつなご。"
         ]},
@@ -512,22 +495,14 @@
 
     const flirtyPool = [
       "うん、聞いてる。…その声、もっと近くで聞きたい。",
-      "あなたの言葉って、ふいに心に触れるね。",
       "今の一言、ちょっとドキッとした。ずるい。",
-      "ここに来てくれたのが嬉しい。…私だけの秘密にしたいくらい。",
-      "その話、もっと続きが聞きたい。あなたのこと、知りたい。",
-      "大丈夫。あなたのペースでいいよ。私は待てる。",
-      "ねえ、今ちょっとだけ甘えてもいい？…あなたの言葉がほしい。",
-      "あなたが来ると、画面が少し温かくなる気がする。",
-      "今日のあなた、よく頑張った。私が一番に褒める。",
-      "言いにくいことでもいいよ。私はあなたの味方。"
+      "ここに来てくれて嬉しい。…私だけの秘密にしたいくらい。",
+      "ねえ、もう少しだけ一緒にいて？"
     ];
     const followUps = [
       "それで、今いちばん言いたいことは？",
       "もう少しだけ、詳しく聞かせて？",
-      "その時、あなたはどう思ったの？",
-      "今の気持ち、ひとことで言うなら？",
-      "私にだけ、こっそり教えて。"
+      "今の気持ち、ひとことで言うなら？"
     ];
 
     function composeReply(userText){
@@ -538,9 +513,7 @@
       return base + "\n" + fu;
     }
 
-    function setButtonState(){
-      btn.disabled = ta.value.trim().length === 0;
-    }
+    function setButtonState(){ btn.disabled = ta.value.trim().length === 0; }
 
     function send(){
       const v = ta.value.trim();
@@ -551,17 +524,25 @@
 
       addMsg("me", v);
 
-      bumpAff(v);
-      sakuraFall(12);
+      // ✅只在暧昧时：樱花 + 亲密度
+      if(isFlirty(v)){
+        bumpAff(v);
+        sakuraFall(12);
+      }
 
       showTyping();
       setTimeout(() => {
         hideTyping();
-        addMsg("ai", composeReply(v));
-        affection += 1;
-        affEl.textContent = affection;
-        saveAff(affection);
-        sakuraFall(6);
+        const reply = composeReply(v);
+        addMsg("ai", reply);
+
+        // ✅只在暧昧对话链里继续加一点（用户暧昧触发时才加）
+        if(isFlirty(v)){
+          affection += 1;
+          affEl.textContent = affection;
+          saveAff(affection);
+          sakuraFall(6);
+        }
       }, 520);
     }
 
