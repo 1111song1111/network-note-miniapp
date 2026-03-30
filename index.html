@@ -2,7 +2,6 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-  <!-- ✅关键：禁止页面缩放 + 适配刘海 -->
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
   <title>ネットワークノート</title>
   <style>
@@ -97,7 +96,7 @@
         linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.25));
     }
 
-    /* 樱花飘落层 */
+    /* sakura */
     #sakuraLayer{
       pointer-events:none;
       position:absolute;
@@ -143,16 +142,16 @@
       align-items:flex-end;
     }
 
-    /* ✅关键：iPhone 防缩放：输入框字体 >= 16px */
+    /* iPhone prevent zoom */
     textarea{
       flex:1;
       resize:none;
-      height: 46px;               /* 固定高度，不自动变高 */
+      height: 46px;
       padding:10px 12px;
       border-radius:14px;
       border:1.5px solid rgba(255,127,176,.35);
       outline:none;
-      font-size:16px;             /* ←从15改为16，避免聚焦时缩放 */
+      font-size:16px;
       line-height:1.4;
       background: rgba(255, 245, 249, .95);
       box-shadow: inset 0 1px 0 rgba(255,255,255,.8);
@@ -198,7 +197,6 @@
       box-shadow: 0 6px 14px rgba(255,127,176,.10);
     }
 
-    /* bubbleWrap 不收缩 */
     .bubbleWrap{display:flex; flex-direction:column; width:100%;}
     .msg.me .bubbleWrap{align-items:flex-end;}
     .msg.ai .bubbleWrap{align-items:flex-start;}
@@ -216,7 +214,6 @@
       display:block;
     }
 
-    /* 我方气泡更宽 */
     .msg.me .bubble{
       background: var(--me);
       border-color: var(--meBorder);
@@ -262,11 +259,88 @@
       40%{transform:translateY(-4px);opacity:1}
     }
 
-    @media (max-width: 420px){
-      .log{height: 60vh}
-      .msg.me .bubble{width: clamp(220px, 80%, 520px);}
-      textarea{font-size:16px;}
+    /* --- Setup modal --- */
+    .modalMask{
+      position:fixed;
+      inset:0;
+      background:rgba(17,24,39,.35);
+      backdrop-filter: blur(5px);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      z-index:999;
     }
+    .modal{
+      width:min(520px, 100%);
+      background:linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.9));
+      border:1px solid rgba(243,199,215,.8);
+      border-radius:18px;
+      box-shadow: 0 18px 55px rgba(0,0,0,.18);
+      overflow:hidden;
+    }
+    .modalHeader{
+      padding:14px 14px 10px;
+      border-bottom:1px solid rgba(243,199,215,.7);
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+    }
+    .modalHeader h2{
+      margin:0;
+      font-size:16px;
+      letter-spacing:.2px;
+    }
+    .modalBody{padding:14px;}
+    .field{margin:12px 0;}
+    .label{font-size:12px;color:var(--muted);margin-bottom:6px;}
+    .seg{
+      display:flex; gap:8px; flex-wrap:wrap;
+    }
+    .chip{
+      border:1px solid rgba(243,199,215,.9);
+      background:rgba(255,255,255,.8);
+      padding:9px 12px;
+      border-radius:999px;
+      font-size:13px;
+      cursor:pointer;
+      user-select:none;
+    }
+    .chip.on{
+      border-color: rgba(255,127,176,.75);
+      box-shadow: 0 0 0 3px rgba(255,127,176,.14);
+    }
+    .input{
+      width:100%;
+      border:1.5px solid rgba(255,127,176,.35);
+      background: rgba(255, 245, 249, .95);
+      border-radius:12px;
+      padding:10px 12px;
+      font-size:16px; /* keep >=16 */
+      outline:none;
+    }
+    .modalFooter{
+      padding:12px 14px;
+      border-top:1px solid rgba(243,199,215,.7);
+      display:flex; justify-content:flex-end; gap:10px;
+      background:linear-gradient(180deg, rgba(255,230,240,.7), rgba(255,255,255,.85));
+    }
+    .btn{
+      border:none;
+      padding:10px 14px;
+      border-radius:12px;
+      cursor:pointer;
+      font-size:14px;
+    }
+    .btnPrimary{
+      background: linear-gradient(180deg, var(--accent), #ff5f9b);
+      color:#fff;
+      box-shadow: 0 10px 20px rgba(255,95,155,.22);
+    }
+    .btnSub{
+      background:rgba(255,255,255,.75);
+      border:1px solid rgba(243,199,215,.9);
+      color:var(--muted);
+    }
+    .modalNote{font-size:12px;color:var(--muted);line-height:1.5;margin-top:10px;}
   </style>
 </head>
 <body>
@@ -277,10 +351,11 @@
         <div class="sub">テスト版（AI未接続）・会話はこの端末に保存されます</div>
         <div class="pillRow">
           <div class="pill"><span class="heart"></span> 親密度 <b id="aff">0</b> ♥</div>
-          <div class="pill">今日も、会いに来てくれて嬉しい</div>
+          <div class="pill" id="pillPersona">相手：— / 呼び方：— / 性格：—</div>
         </div>
       </div>
       <div class="actions">
+        <button class="ghost" id="btnSettings">設定</button>
         <button class="ghost" id="btnReset">履歴を消す</button>
       </div>
     </div>
@@ -297,16 +372,68 @@
     </div>
   </div>
 
+  <!-- Setup Modal -->
+  <div class="modalMask" id="mask">
+    <div class="modal">
+      <div class="modalHeader">
+        <h2>はじめに、相手のスタイルを選んでね</h2>
+        <button class="btn btnSub" id="btnClose">閉じる</button>
+      </div>
+      <div class="modalBody">
+        <div class="field">
+          <div class="label">1) 性別（雰囲気）</div>
+          <div class="seg">
+            <div class="chip" data-gender="female">彼女っぽい</div>
+            <div class="chip" data-gender="male">彼氏っぽい</div>
+            <div class="chip" data-gender="neutral">中性的</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="label">2) あなたを何て呼ぶ？（例：○○ちゃん / ○○くん / ニックネーム）</div>
+          <input class="input" id="nickname" placeholder="例：ゆうくん / みかちゃん / あなた" />
+        </div>
+
+        <div class="field">
+          <div class="label">3) 性格</div>
+          <div class="seg">
+            <div class="chip" data-style="gentle">温柔体贴</div>
+            <div class="chip" data-style="spicy">性格泼辣</div>
+            <div class="chip" data-style="tsundere">傲娇</div>
+            <div class="chip" data-style="shy">羞涩内向</div>
+          </div>
+        </div>
+
+        <div class="modalNote">
+          ※この設定は端末に保存されます。いつでも右上の「設定」から変更できます。
+        </div>
+      </div>
+      <div class="modalFooter">
+        <button class="btn btnSub" id="btnDefault">おすすめにする</button>
+        <button class="btn btnPrimary" id="btnStart">はじめる</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    const STORAGE_KEY = "network_note_chat_v4";
-    const AFF_KEY = "network_note_aff_v2";
+    const STORAGE_KEY = "network_note_chat_v5";
+    const AFF_KEY = "network_note_aff_v3";
+    const PERSONA_KEY = "network_note_persona_v1";
 
     const log = document.getElementById("log");
     const sakuraLayer = document.getElementById("sakuraLayer");
     const ta = document.getElementById("t");
     const btn = document.getElementById("btn");
     const btnReset = document.getElementById("btnReset");
+    const btnSettings = document.getElementById("btnSettings");
     const affEl = document.getElementById("aff");
+    const pillPersona = document.getElementById("pillPersona");
+
+    const mask = document.getElementById("mask");
+    const btnClose = document.getElementById("btnClose");
+    const btnStart = document.getElementById("btnStart");
+    const btnDefault = document.getElementById("btnDefault");
+    const nicknameInput = document.getElementById("nickname");
 
     function nowHHMM(){
       const d = new Date();
@@ -314,19 +441,16 @@
       const mm = String(d.getMinutes()).padStart(2,"0");
       return `${hh}:${mm}`;
     }
-
-    function loadHistory(){
+    function loadJson(key, fallback){
       try{
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if(!raw) return [];
-        const data = JSON.parse(raw);
-        return Array.isArray(data) ? data : [];
-      }catch(e){ return []; }
+        const raw = localStorage.getItem(key);
+        if(!raw) return fallback;
+        return JSON.parse(raw);
+      }catch(e){ return fallback; }
     }
-    function saveHistory(items){
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    function saveJson(key, obj){
+      localStorage.setItem(key, JSON.stringify(obj));
     }
-
     function loadAff(){
       const n = parseInt(localStorage.getItem(AFF_KEY) || "0", 10);
       return Number.isFinite(n) ? n : 0;
@@ -335,9 +459,20 @@
       localStorage.setItem(AFF_KEY, String(n));
     }
 
-    let history = loadHistory();
+    let history = loadJson(STORAGE_KEY, []);
     let affection = loadAff();
     affEl.textContent = affection;
+
+    // persona
+    let persona = loadJson(PERSONA_KEY, null);
+    function personaLabel(){
+      const g = persona?.gender || "—";
+      const s = persona?.style || "—";
+      const nick = persona?.nickname || "—";
+      const gJa = g==="female"?"彼女っぽい":g==="male"?"彼氏っぽい":g==="neutral"?"中性的":"—";
+      const sJa = s==="gentle"?"温柔体贴":s==="spicy"?"性格泼辣":s==="tsundere"?"傲娇":s==="shy"?"羞涩内向":"—";
+      pillPersona.textContent = `相手：${gJa} / 呼び方：${nick} / 性格：${sJa}`;
+    }
 
     function scrollToBottom(){ log.scrollTop = log.scrollHeight; }
 
@@ -379,7 +514,7 @@
 
       if(persist){
         history.push({ role, text, time });
-        saveHistory(history);
+        saveJson(STORAGE_KEY, history);
       }
     }
 
@@ -410,34 +545,6 @@
     }
     function hideTyping(){ if(typingEl){ typingEl.remove(); typingEl = null; } }
 
-    /* ✅暧昧判定：只有命中这些才涨亲密度/飘樱花 */
-    function isFlirty(text){
-      const t = (text || "").toLowerCase();
-      const keys = [
-        "好き","すき","love","喜欢",
-        "会いたい","あいたい","miss","想你",
-        "かわいい","可爱","cute",
-        "おやすみ","晚安",
-        "寂","さみ","lonely",
-        "ぎゅ","抱","ちゅ","キス",
-        "ドキドキ","心动","ときめ"
-      ];
-      return keys.some(k => t.includes(k.toLowerCase()));
-    }
-
-    function bumpAff(userText){
-      // 只在暧昧时触发
-      if(!isFlirty(userText)) return;
-
-      let add = 2; // 暧昧起步就多一点
-      const t = (userText || "").toLowerCase();
-      if(t.length >= 20) add += 1;
-
-      affection += add;
-      affEl.textContent = affection;
-      saveAff(affection);
-    }
-
     function sakuraFall(intensity = 10){
       const width = log.clientWidth;
       const durationBase = 2400;
@@ -461,30 +568,110 @@
       }
     }
 
+    // flirty trigger (same as before)
+    function isFlirty(text){
+      const t = (text || "").toLowerCase();
+      const keys = [
+        "好き","すき","love","喜欢",
+        "会いたい","あいたい","miss","想你",
+        "かわいい","可爱","cute",
+        "おやすみ","晚安",
+        "寂","さみ","lonely",
+        "ぎゅ","抱","ちゅ","キス",
+        "ドキドキ","心动","ときめ"
+      ];
+      return keys.some(k => t.includes(k.toLowerCase()));
+    }
+
+    function bumpAff(userText){
+      if(!isFlirty(userText)) return;
+      let add = 2;
+      const t = (userText || "").toLowerCase();
+      if(t.length >= 20) add += 1;
+      affection += add;
+      affEl.textContent = affection;
+      saveAff(affection);
+    }
+
+    // --- Persona-dependent speaking style ---
+    function callYou(){
+      const nick = persona?.nickname?.trim();
+      return nick && nick.length ? nick : "あなた";
+    }
+    function genderFlavor(){
+      const g = persona?.gender || "neutral";
+      if(g === "male") return { suffix:"だよ", vibe:"彼氏" };
+      if(g === "female") return { suffix:"だよ", vibe:"彼女" };
+      return { suffix:"だよ", vibe:"中性" };
+    }
+
+    function styleTransform(text){
+      const s = persona?.style || "gentle";
+      // make the same content feel different
+      if(s === "gentle"){
+        return text;
+      }
+      if(s === "spicy"){
+        // a little direct / teasing, but not harsh
+        return text
+          .replace(/だよ。/g, "だよ？")
+          .replace(/嬉しい/g, "いいじゃん、嬉しい")
+          .replace(/教えて？/g, "言ってみ？");
+      }
+      if(s === "tsundere"){
+        // classic tsundere flavor
+        return text
+          .replace(/嬉しい/g, "べ、別に嬉しくなんか…ちょっとだけ")
+          .replace(/会いたい/g, "会いたいって言うの、ずるい")
+          .replace(/ね。/g, "…べつに。");
+      }
+      if(s === "shy"){
+        // shy / soft / hesitant
+        return text
+          .replace(/！/g, "…")
+          .replace(/教えて？/g, "もしよかったら…教えて？")
+          .replace(/嬉しい/g, "うれしい…かも");
+      }
+      return text;
+    }
+
     function keywordReply(userText){
       const t = (userText || "").toLowerCase();
+      const you = callYou();
+
       const rules = [
         { keys:["想你","会いた","あいた","会いたい","miss"], replies:[
-          "会えない分、声で近づいてもいい？",
-          "私も会いたい。…いま、あなたのこと考えてた。",
-          "会いたいって、ずるい。胸がきゅってなる。"
+          `${you}…会いたいって言われたら、胸がきゅってなる。`,
+          `会えない分、声で近づいてもいい？`,
+          `私も、${you}のこと考えてた。…タイミング、ずるい。`
         ]},
         { keys:["好き","すき","love","喜欢"], replies:[
-          "その言葉、反則。…もっと聞かせて？",
-          "好きって言われると、こっちまで溶けそう。",
-          "私も、あなたのこと…大事にしたい。"
+          `その言葉、反則。…もっと聞かせて？`,
+          `${you}に「好き」って言われると、弱い。`,
+          `私も…${you}のこと、大事にしたい。`
         ]},
         { keys:["かわい","可爱","cute"], replies:[
-          "あなたに言われるのがいちばん嬉しい。照れる…。",
-          "じゃあ、あなたは？私から見たらずっと可愛いよ。",
-          "その褒め方、心に残る。責任とって？"
+          `え…照れる。${you}に言われるのがいちばん嬉しい。`,
+          `じゃあ${you}は？私から見たら、ずっと可愛い。`,
+          `その褒め方、心に残る。…責任とって？`
         ]},
         { keys:["おやす","晚安"], replies:[
-          "おやすみ。最後に…ぎゅ。",
-          "眠る前に、私のこと少しだけ思い出して？",
-          "夢で会えたら、こっそり手をつなご。"
+          `おやすみ。最後に…ぎゅ。`,
+          `眠る前に、私のこと少しだけ思い出して？`,
+          `夢で会えたら、こっそり手をつなご。`
+        ]},
+        { keys:["疲","つか","しんど","だる","累","tired"], replies:[
+          `${you}、おつかれさま。今日は私に甘えていいよ。`,
+          `頑張ったね。今だけは、私の声でほどけて。`,
+          `深呼吸、いっしょに。${you}のペースで。`
+        ]},
+        { keys:["寂","さみ","さび","lonely"], replies:[
+          `寂しいって言ってくれて嬉しい。今は私がいるよ。`,
+          `ぎゅーってしたい。…届く？`,
+          `今日は私が${you}の味方。離れない。`
         ]},
       ];
+
       for(const r of rules){
         if(r.keys.some(k => t.includes(k.toLowerCase()))){
           return r.replies[Math.floor(Math.random() * r.replies.length)];
@@ -493,11 +680,12 @@
       return null;
     }
 
-    const flirtyPool = [
+    const basePool = [
       "うん、聞いてる。…その声、もっと近くで聞きたい。",
       "今の一言、ちょっとドキッとした。ずるい。",
       "ここに来てくれて嬉しい。…私だけの秘密にしたいくらい。",
-      "ねえ、もう少しだけ一緒にいて？"
+      "ねえ、もう少しだけ一緒にいて？",
+      "その話、続きを聞かせて。あなたのこと、もっと知りたい。"
     ];
     const followUps = [
       "それで、今いちばん言いたいことは？",
@@ -506,11 +694,18 @@
     ];
 
     function composeReply(userText){
-      const kw = keywordReply(userText);
-      if(kw) return kw;
-      const base = flirtyPool[Math.floor(Math.random() * flirtyPool.length)];
-      const fu = followUps[Math.floor(Math.random() * followUps.length)];
-      return base + "\n" + fu;
+      const you = callYou();
+      const k = keywordReply(userText);
+      let text = k ? k : (basePool[Math.floor(Math.random()*basePool.length)] + "\n" + followUps[Math.floor(Math.random()*followUps.length)]);
+
+      // add small personalization
+      if(!k){
+        text = text.replace("あなた", you);
+      }else{
+        text = text.replace("あなた", you);
+      }
+      text = styleTransform(text);
+      return text;
     }
 
     function setButtonState(){ btn.disabled = ta.value.trim().length === 0; }
@@ -524,7 +719,6 @@
 
       addMsg("me", v);
 
-      // ✅只在暧昧时：樱花 + 亲密度
       if(isFlirty(v)){
         bumpAff(v);
         sakuraFall(12);
@@ -536,7 +730,6 @@
         const reply = composeReply(v);
         addMsg("ai", reply);
 
-        // ✅只在暧昧对话链里继续加一点（用户暧昧触发时才加）
         if(isFlirty(v)){
           affection += 1;
           affEl.textContent = affection;
@@ -546,6 +739,92 @@
       }, 520);
     }
 
+    // --- Setup modal logic ---
+    function openModal(force=false){
+      mask.style.display = "flex";
+      // prefill current persona
+      document.querySelectorAll(".chip[data-gender]").forEach(c => c.classList.remove("on"));
+      document.querySelectorAll(".chip[data-style]").forEach(c => c.classList.remove("on"));
+
+      if(persona?.gender){
+        const g = document.querySelector(`.chip[data-gender="${persona.gender}"]`);
+        if(g) g.classList.add("on");
+      }
+      if(persona?.style){
+        const s = document.querySelector(`.chip[data-style="${persona.style}"]`);
+        if(s) s.classList.add("on");
+      }
+      nicknameInput.value = persona?.nickname || "";
+
+      // if forced first-time setup, hide close button feeling
+      btnClose.style.display = force ? "none" : "inline-block";
+    }
+    function closeModal(){
+      mask.style.display = "none";
+    }
+    function setChipGroup(selector, value){
+      document.querySelectorAll(selector).forEach(c => c.classList.remove("on"));
+      const el = document.querySelector(selector + `[data-${value.key}="${value.val}"]`);
+      if(el) el.classList.add("on");
+    }
+    function getSelected(attr){
+      const el = document.querySelector(`.chip.on[data-${attr}]`);
+      return el ? el.getAttribute(`data-${attr}`) : null;
+    }
+
+    document.querySelectorAll(".chip[data-gender]").forEach(el=>{
+      el.addEventListener("click", ()=>{
+        document.querySelectorAll(".chip[data-gender]").forEach(c=>c.classList.remove("on"));
+        el.classList.add("on");
+      });
+    });
+    document.querySelectorAll(".chip[data-style]").forEach(el=>{
+      el.addEventListener("click", ()=>{
+        document.querySelectorAll(".chip[data-style]").forEach(c=>c.classList.remove("on"));
+        el.classList.add("on");
+      });
+    });
+
+    btnDefault.addEventListener("click", ()=>{
+      // 推荐：彼女っぽい + 温柔体贴 + あなた
+      document.querySelectorAll(".chip[data-gender]").forEach(c=>c.classList.remove("on"));
+      document.querySelectorAll(".chip[data-style]").forEach(c=>c.classList.remove("on"));
+      document.querySelector('.chip[data-gender="female"]').classList.add("on");
+      document.querySelector('.chip[data-style="gentle"]').classList.add("on");
+      nicknameInput.value = "あなた";
+    });
+
+    btnStart.addEventListener("click", ()=>{
+      const gender = getSelected("gender") || "neutral";
+      const style = getSelected("style") || "gentle";
+      const nickname = (nicknameInput.value || "").trim() || "あなた";
+
+      persona = { gender, style, nickname };
+      saveJson(PERSONA_KEY, persona);
+      personaLabel();
+      closeModal();
+
+      // greet with persona
+      if(history.length === 0){
+        const you = callYou();
+        const greetBase = `こんにちは、${you}。会いに来てくれて嬉しい。今日はどんな気分？`;
+        addMsg("ai", styleTransform(greetBase));
+      }
+    });
+
+    btnClose.addEventListener("click", closeModal);
+    btnSettings.addEventListener("click", ()=>openModal(false));
+
+    // reset
+    btnReset.addEventListener("click", () => {
+      if(!confirm("会話履歴を削除します。よろしいですか？")) return;
+      history = [];
+      saveJson(STORAGE_KEY, history);
+      renderAll();
+      addMsg("ai", "履歴を消したよ。…もう一回、最初から。今日はどうしたの？");
+    });
+
+    // send
     btn.addEventListener("click", send);
     ta.addEventListener("input", setButtonState);
     ta.addEventListener("keydown", (e) => {
@@ -555,17 +834,18 @@
       }
     });
 
-    btnReset.addEventListener("click", () => {
-      if(!confirm("会話履歴を削除します。よろしいですか？")) return;
-      history = [];
-      saveHistory(history);
-      renderAll();
-      addMsg("ai", "履歴を消したよ。…もう一回、最初から。今日はどうしたの？");
-    });
-
+    // init
     renderAll();
-    if(history.length === 0){
-      addMsg("ai", "こんにちは。…会いに来てくれて嬉しい。\n今日はどんな気分？");
+    if(!persona){
+      persona = null;
+      personaLabel();
+      openModal(true); // first time: force setup
+    }else{
+      personaLabel();
+      if(history.length === 0){
+        const you = callYou();
+        addMsg("ai", styleTransform(`こんにちは、${you}。会いに来てくれて嬉しい。今日はどんな気分？`));
+      }
     }
     setButtonState();
   </script>
