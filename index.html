@@ -30,279 +30,162 @@
                  var(--bg);
       color:var(--text);
     }
-    .wrap{
-      max-width: 820px;
-      margin: 0 auto;
-      padding: 14px 14px calc(14px + env(safe-area-inset-bottom));
-    }
+    .wrap{max-width:820px;margin:0 auto;padding:14px 14px calc(14px + env(safe-area-inset-bottom));}
+    .topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px;}
+    .title{display:flex;flex-direction:column;gap:2px;}
+    .title h1{font-size:18px;margin:0;line-height:1.2;letter-spacing:.2px;}
+    .title .sub{font-size:12px;color:var(--muted);}
 
-    .topbar{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:10px;
-      margin-bottom:10px;
-    }
-    .title{display:flex; flex-direction:column; gap:2px;}
-    .title h1{font-size:18px; margin:0; line-height:1.2; letter-spacing:.2px;}
-    .title .sub{font-size:12px; color:var(--muted);}
-
-    .pillRow{display:flex; gap:8px; align-items:center; margin-top:6px; flex-wrap:wrap;}
+    .pillRow{display:flex;gap:8px;align-items:center;margin-top:6px;flex-wrap:wrap;}
     .pill{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:7px 10px;
-      border-radius:999px;
+      display:inline-flex;align-items:center;gap:8px;
+      padding:7px 10px;border-radius:999px;
       border:1px solid rgba(243,199,215,.75);
       background:rgba(255,255,255,.75);
-      font-size:12px;
-      color:var(--muted);
-      box-shadow: 0 6px 14px rgba(255,127,176,.10);
+      font-size:12px;color:var(--muted);
+      box-shadow:0 6px 14px rgba(255,127,176,.10);
       user-select:none;
     }
-    .heart{
-      width:10px;height:10px;border-radius:999px;
-      background:linear-gradient(180deg, var(--accent), #ff5f9b);
-      box-shadow: 0 6px 14px rgba(255,95,155,.25);
-    }
+    .heart{width:10px;height:10px;border-radius:999px;background:linear-gradient(180deg,var(--accent),#ff5f9b);box-shadow:0 6px 14px rgba(255,95,155,.25);}
 
-    .actions{display:flex; gap:8px;}
+    .actions{display:flex;gap:8px;}
     .ghost{
       border:1px solid var(--border);
       background:rgba(255,255,255,.7);
-      padding:8px 10px;
-      border-radius:999px;
-      font-size:13px;
-      cursor:pointer;
+      padding:8px 10px;border-radius:999px;
+      font-size:13px;cursor:pointer;
     }
 
     .card{
       position:relative;
       background:linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.88));
       border:1px solid rgba(243,199,215,.75);
-      border-radius:18px;
-      overflow:hidden;
-      box-shadow: var(--shadow);
+      border-radius:18px;overflow:hidden;
+      box-shadow:var(--shadow);
       backdrop-filter: blur(6px);
     }
-
     .log{
       position:relative;
-      height: 64vh;
-      overflow:auto;
-      padding: 14px;
+      height:64vh;overflow:auto;padding:14px;
       background:
         radial-gradient(600px 260px at 20% 0%, rgba(255,182,209,.18), transparent 60%),
         radial-gradient(500px 240px at 80% 10%, rgba(255,127,176,.12), transparent 60%),
         linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.25));
     }
 
-    /* sakura */
-    #sakuraLayer{
-      pointer-events:none;
-      position:absolute;
-      inset:0;
-      overflow:hidden;
-      z-index:5;
-    }
+    /* sakura layer */
+    #sakuraLayer{pointer-events:none;position:absolute;inset:0;overflow:hidden;z-index:5;}
     .petal{
-      position:absolute;
-      top:-24px;
-      width:14px; height:10px;
+      position:absolute;top:-24px;width:14px;height:10px;
       background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.9), rgba(255,182,209,.95) 45%, rgba(255,127,176,.85));
-      border-radius: 70% 30% 70% 30%;
+      border-radius:70% 30% 70% 30%;
       opacity:.95;
-      filter: drop-shadow(0 6px 10px rgba(255,127,176,.18));
-      animation-name: fall, sway;
-      animation-timing-function: linear, ease-in-out;
-      animation-iteration-count: 1, infinite;
+      filter:drop-shadow(0 6px 10px rgba(255,127,176,.18));
+      animation-name:fall,sway;animation-timing-function:linear,ease-in-out;animation-iteration-count:1,infinite;
     }
-    @keyframes fall{
-      0%{transform:translateY(0) rotate(0deg); opacity:0.95}
-      85%{opacity:0.95}
-      100%{transform:translateY(92vh) rotate(260deg); opacity:0}
-    }
-    @keyframes sway{
-      0%,100%{margin-left:0}
-      50%{margin-left:18px}
-    }
+    @keyframes fall{0%{transform:translateY(0) rotate(0deg);opacity:.95}85%{opacity:.95}100%{transform:translateY(92vh) rotate(260deg);opacity:0}}
+    @keyframes sway{0%,100%{margin-left:0}50%{margin-left:18px}}
 
-    .hint{
-      font-size:12px;color:var(--muted);
-      padding:10px 12px;
-      border-top:1px solid rgba(243,199,215,.65);
-      background:linear-gradient(180deg, rgba(255,240,246,.9), rgba(255,255,255,.9));
-    }
-
+    .hint{font-size:12px;color:var(--muted);padding:10px 12px;border-top:1px solid rgba(243,199,215,.65);
+      background:linear-gradient(180deg, rgba(255,240,246,.9), rgba(255,255,255,.9));}
     .row{
-      display:flex;
-      gap:10px;
-      padding: 12px;
-      border-top: 1px solid rgba(243,199,215,.65);
-      background: linear-gradient(180deg, rgba(255,230,240,.9), rgba(255,255,255,.92));
+      display:flex;gap:10px;padding:12px;
+      border-top:1px solid rgba(243,199,215,.65);
+      background:linear-gradient(180deg, rgba(255,230,240,.9), rgba(255,255,255,.92));
       align-items:flex-end;
     }
 
-    /* iPhone prevent zoom */
     textarea{
-      flex:1;
-      resize:none;
-      height: 46px;
-      padding:10px 12px;
-      border-radius:14px;
+      flex:1;resize:none;height:46px;
+      padding:10px 12px;border-radius:14px;
       border:1.5px solid rgba(255,127,176,.35);
-      outline:none;
-      font-size:16px;
-      line-height:1.4;
-      background: rgba(255, 245, 249, .95);
+      outline:none;font-size:16px;line-height:1.4;
+      background:rgba(255,245,249,.95);
       box-shadow: inset 0 1px 0 rgba(255,255,255,.8);
     }
-    textarea:focus{
-      border-color: rgba(255,127,176,.75);
-      box-shadow: 0 0 0 3px rgba(255,127,176,.18);
-    }
+    textarea:focus{border-color:rgba(255,127,176,.75);box-shadow:0 0 0 3px rgba(255,127,176,.18);}
 
     .send{
-      border:none;
-      background: linear-gradient(180deg, var(--accent), #ff5f9b);
-      color:white;
-      padding:10px 14px;
-      border-radius:14px;
-      font-size:14px;
-      cursor:pointer;
-      white-space:nowrap;
-      box-shadow: 0 8px 18px rgba(255,95,155,.22);
+      border:none;background:linear-gradient(180deg,var(--accent),#ff5f9b);
+      color:white;padding:10px 14px;border-radius:14px;
+      font-size:14px;cursor:pointer;white-space:nowrap;
+      box-shadow:0 8px 18px rgba(255,95,155,.22);
       height:46px;
     }
-    .send:disabled{opacity:.55; cursor:not-allowed; box-shadow:none;}
+    .send:disabled{opacity:.55;cursor:not-allowed;box-shadow:none;}
 
-    .msg{
-      display:flex;
-      margin: 10px 0;
-      gap:8px;
-      align-items:flex-end;
-      width:100%;
-    }
+    .msg{display:flex;margin:10px 0;gap:8px;align-items:flex-end;width:100%;}
     .msg.me{justify-content:flex-end}
     .msg.ai{justify-content:flex-start}
-
     .avatar{
-      width:28px; height:28px;
-      border-radius:999px;
+      width:28px;height:28px;border-radius:999px;
       border:1px solid rgba(243,199,215,.8);
       background:rgba(255,255,255,.9);
-      display:flex; align-items:center; justify-content:center;
-      font-size:13px;
-      color:var(--muted);
+      display:flex;align-items:center;justify-content:center;
+      font-size:13px;color:var(--muted);
       flex:0 0 auto;
-      box-shadow: 0 6px 14px rgba(255,127,176,.10);
+      box-shadow:0 6px 14px rgba(255,127,176,.10);
     }
-
-    .bubbleWrap{display:flex; flex-direction:column; width:100%;}
+    .bubbleWrap{display:flex;flex-direction:column;width:100%;}
     .msg.me .bubbleWrap{align-items:flex-end;}
     .msg.ai .bubbleWrap{align-items:flex-start;}
-
     .bubble{
-      border-radius: 18px;
-      padding: 10px 12px;
-      border: 1px solid var(--aiBorder);
-      background: var(--ai);
-      white-space:pre-wrap;
-      word-break:break-word;
-      line-height:1.55;
-      font-size:15px;
-      box-shadow: 0 6px 14px rgba(17,24,39,.04);
+      border-radius:18px;padding:10px 12px;border:1px solid var(--aiBorder);
+      background:var(--ai);white-space:pre-wrap;word-break:break-word;
+      line-height:1.55;font-size:15px;
+      box-shadow:0 6px 14px rgba(17,24,39,.04);
       display:block;
     }
-
     .msg.me .bubble{
-      background: var(--me);
-      border-color: var(--meBorder);
-      border-bottom-right-radius: 8px;
-      width: clamp(240px, 72%, 560px);
-      max-width: 92%;
-      text-align:left;
+      background:var(--me);border-color:var(--meBorder);
+      border-bottom-right-radius:8px;
+      width:clamp(240px,72%,560px);
+      max-width:92%;text-align:left;
     }
-
-    .msg.ai .bubble{
-      border-bottom-left-radius: 8px;
-      max-width: 88%;
-    }
-
-    .meta{
-      margin-top:6px;
-      font-size:11px;
-      color:var(--muted);
-      padding-left:2px;
-      width: clamp(240px, 72%, 560px);
-    }
+    .msg.ai .bubble{border-bottom-left-radius:8px;max-width:88%;}
+    .meta{margin-top:6px;font-size:11px;color:var(--muted);padding-left:2px;width:clamp(240px,72%,560px);}
     .msg.ai .meta{width:auto}
 
     .typing{
-      display:inline-flex;
-      gap:4px;
-      align-items:center;
-      padding:10px 12px;
-      border-radius:18px;
-      border:1px solid var(--aiBorder);
-      background:rgba(255,255,255,.92);
-      max-width: 88%;
-      box-shadow: 0 6px 14px rgba(17,24,39,.04);
+      display:inline-flex;gap:4px;align-items:center;
+      padding:10px 12px;border-radius:18px;border:1px solid var(--aiBorder);
+      background:rgba(255,255,255,.92);max-width:88%;
+      box-shadow:0 6px 14px rgba(17,24,39,.04);
     }
-    .dot{
-      width:6px;height:6px;border-radius:999px;background:rgba(255,127,176,.55);
-      animation: bounce 1.2s infinite ease-in-out;
-    }
+    .dot{width:6px;height:6px;border-radius:999px;background:rgba(255,127,176,.55);animation:bounce 1.2s infinite ease-in-out;}
     .dot:nth-child(2){animation-delay:.15s}
     .dot:nth-child(3){animation-delay:.3s}
-    @keyframes bounce{
-      0%,80%,100%{transform:translateY(0);opacity:.55}
-      40%{transform:translateY(-4px);opacity:1}
-    }
+    @keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:.55}40%{transform:translateY(-4px);opacity:1}}
 
-    /* --- Setup modal --- */
+    /* modal */
     .modalMask{
-      position:fixed;
-      inset:0;
-      background:rgba(17,24,39,.35);
+      position:fixed;inset:0;background:rgba(17,24,39,.35);
       backdrop-filter: blur(5px);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding:18px;
-      z-index:999;
+      display:none;align-items:center;justify-content:center;
+      padding:18px;z-index:999;
     }
     .modal{
-      width:min(520px, 100%);
+      width:min(540px, 100%);
       background:linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.9));
       border:1px solid rgba(243,199,215,.8);
       border-radius:18px;
-      box-shadow: 0 18px 55px rgba(0,0,0,.18);
+      box-shadow:0 18px 55px rgba(0,0,0,.18);
       overflow:hidden;
     }
     .modalHeader{
-      padding:14px 14px 10px;
-      border-bottom:1px solid rgba(243,199,215,.7);
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding:14px 14px 10px;border-bottom:1px solid rgba(243,199,215,.7);
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
     }
-    .modalHeader h2{
-      margin:0;
-      font-size:16px;
-      letter-spacing:.2px;
-    }
+    .modalHeader h2{margin:0;font-size:16px;letter-spacing:.2px;}
     .modalBody{padding:14px;}
     .field{margin:12px 0;}
     .label{font-size:12px;color:var(--muted);margin-bottom:6px;}
-    .seg{
-      display:flex; gap:8px; flex-wrap:wrap;
-    }
+    .seg{display:flex;gap:8px;flex-wrap:wrap;}
     .chip{
       border:1px solid rgba(243,199,215,.9);
       background:rgba(255,255,255,.8);
-      padding:9px 12px;
-      border-radius:999px;
-      font-size:13px;
-      cursor:pointer;
-      user-select:none;
+      padding:9px 12px;border-radius:999px;
+      font-size:13px;cursor:pointer;user-select:none;
     }
     .chip.on{
       border-color: rgba(255,127,176,.75);
@@ -314,32 +197,17 @@
       background: rgba(255, 245, 249, .95);
       border-radius:12px;
       padding:10px 12px;
-      font-size:16px; /* keep >=16 */
+      font-size:16px;
       outline:none;
     }
     .modalFooter{
-      padding:12px 14px;
-      border-top:1px solid rgba(243,199,215,.7);
-      display:flex; justify-content:flex-end; gap:10px;
+      padding:12px 14px;border-top:1px solid rgba(243,199,215,.7);
+      display:flex;justify-content:flex-end;gap:10px;
       background:linear-gradient(180deg, rgba(255,230,240,.7), rgba(255,255,255,.85));
     }
-    .btn{
-      border:none;
-      padding:10px 14px;
-      border-radius:12px;
-      cursor:pointer;
-      font-size:14px;
-    }
-    .btnPrimary{
-      background: linear-gradient(180deg, var(--accent), #ff5f9b);
-      color:#fff;
-      box-shadow: 0 10px 20px rgba(255,95,155,.22);
-    }
-    .btnSub{
-      background:rgba(255,255,255,.75);
-      border:1px solid rgba(243,199,215,.9);
-      color:var(--muted);
-    }
+    .btn{border:none;padding:10px 14px;border-radius:12px;cursor:pointer;font-size:14px;}
+    .btnPrimary{background:linear-gradient(180deg,var(--accent),#ff5f9b);color:#fff;box-shadow:0 10px 20px rgba(255,95,155,.22);}
+    .btnSub{background:rgba(255,255,255,.75);border:1px solid rgba(243,199,215,.9);color:var(--muted);}
     .modalNote{font-size:12px;color:var(--muted);line-height:1.5;margin-top:10px;}
   </style>
 </head>
@@ -348,7 +216,7 @@
     <div class="topbar">
       <div class="title">
         <h1>ネットワークノート</h1>
-        <div class="sub">テスト版（AI未接続）・会話はこの端末に保存されます</div>
+        <div class="sub">デモ版（AI未接続）・会話と設定は端末に保存されます</div>
         <div class="pillRow">
           <div class="pill"><span class="heart"></span> 親密度 <b id="aff">0</b> ♥</div>
           <div class="pill" id="pillPersona">相手：— / 呼び方：— / 性格：—</div>
@@ -364,9 +232,9 @@
       <div id="log" class="log">
         <div id="sakuraLayer"></div>
       </div>
-      <div class="hint">Enterで送信 / Shift+Enterで改行（※入力欄の高さは固定）</div>
+      <div class="hint">Enterで送信 / Shift+Enterで改行（入力欄の高さは固定）</div>
       <div class="row">
-        <textarea id="t" placeholder="いま何を考えてる？…"></textarea>
+        <textarea id="t" placeholder="いま、なにしてる？…"></textarea>
         <button id="btn" class="send" disabled>送信</button>
       </div>
     </div>
@@ -376,7 +244,7 @@
   <div class="modalMask" id="mask">
     <div class="modal">
       <div class="modalHeader">
-        <h2>はじめに、相手のスタイルを選んでね</h2>
+        <h2>最初に、相手のスタイルを選んでね</h2>
         <button class="btn btnSub" id="btnClose">閉じる</button>
       </div>
       <div class="modalBody">
@@ -397,28 +265,28 @@
         <div class="field">
           <div class="label">3) 性格</div>
           <div class="seg">
-            <div class="chip" data-style="gentle">温柔体贴</div>
-            <div class="chip" data-style="spicy">性格泼辣</div>
-            <div class="chip" data-style="tsundere">傲娇</div>
-            <div class="chip" data-style="shy">羞涩内向</div>
+            <div class="chip" data-style="gentle">やさしい（甘め）</div>
+            <div class="chip" data-style="spicy">サバサバ（小悪魔）</div>
+            <div class="chip" data-style="tsundere">ツンデレ</div>
+            <div class="chip" data-style="shy">照れ屋（内気）</div>
           </div>
         </div>
 
         <div class="modalNote">
-          ※この設定は端末に保存されます。いつでも右上の「設定」から変更できます。
+          ※設定は端末に保存されます。いつでも右上の「設定」から変更できます。
         </div>
       </div>
       <div class="modalFooter">
-        <button class="btn btnSub" id="btnDefault">おすすめにする</button>
+        <button class="btn btnSub" id="btnDefault">おすすめ</button>
         <button class="btn btnPrimary" id="btnStart">はじめる</button>
       </div>
     </div>
   </div>
 
   <script>
-    const STORAGE_KEY = "network_note_chat_v5";
-    const AFF_KEY = "network_note_aff_v3";
-    const PERSONA_KEY = "network_note_persona_v1";
+    const STORAGE_KEY = "network_note_chat_v6";
+    const AFF_KEY = "network_note_aff_v4";
+    const PERSONA_KEY = "network_note_persona_v2";
 
     const log = document.getElementById("log");
     const sakuraLayer = document.getElementById("sakuraLayer");
@@ -437,41 +305,36 @@
 
     function nowHHMM(){
       const d = new Date();
-      const hh = String(d.getHours()).padStart(2,"0");
-      const mm = String(d.getMinutes()).padStart(2,"0");
-      return `${hh}:${mm}`;
+      return String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
     }
     function loadJson(key, fallback){
-      try{
-        const raw = localStorage.getItem(key);
-        if(!raw) return fallback;
-        return JSON.parse(raw);
-      }catch(e){ return fallback; }
+      try{ const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }
+      catch(e){ return fallback; }
     }
-    function saveJson(key, obj){
-      localStorage.setItem(key, JSON.stringify(obj));
-    }
+    function saveJson(key, obj){ localStorage.setItem(key, JSON.stringify(obj)); }
     function loadAff(){
       const n = parseInt(localStorage.getItem(AFF_KEY) || "0", 10);
       return Number.isFinite(n) ? n : 0;
     }
-    function saveAff(n){
-      localStorage.setItem(AFF_KEY, String(n));
-    }
+    function saveAff(n){ localStorage.setItem(AFF_KEY, String(n)); }
 
     let history = loadJson(STORAGE_KEY, []);
     let affection = loadAff();
     affEl.textContent = affection;
 
-    // persona
     let persona = loadJson(PERSONA_KEY, null);
+
     function personaLabel(){
       const g = persona?.gender || "—";
       const s = persona?.style || "—";
       const nick = persona?.nickname || "—";
       const gJa = g==="female"?"彼女っぽい":g==="male"?"彼氏っぽい":g==="neutral"?"中性的":"—";
-      const sJa = s==="gentle"?"温柔体贴":s==="spicy"?"性格泼辣":s==="tsundere"?"傲娇":s==="shy"?"羞涩内向":"—";
+      const sJa = s==="gentle"?"やさしい":s==="spicy"?"サバサバ":s==="tsundere"?"ツンデレ":s==="shy"?"照れ屋":"—";
       pillPersona.textContent = `相手：${gJa} / 呼び方：${nick} / 性格：${sJa}`;
+    }
+    function callYou(){
+      const nick = persona?.nickname?.trim();
+      return nick && nick.length ? nick : "あなた";
     }
 
     function scrollToBottom(){ log.scrollTop = log.scrollHeight; }
@@ -520,9 +383,7 @@
 
     function renderAll(){
       log.querySelectorAll(".msg").forEach(n => n.remove());
-      for(const m of history){
-        addMsg(m.role, m.text, m.time, false);
-      }
+      for(const m of history){ addMsg(m.role, m.text, m.time, false); }
       scrollToBottom();
     }
 
@@ -568,144 +429,165 @@
       }
     }
 
-    // flirty trigger (same as before)
+    // Flirty trigger: only then sakura + affection
     function isFlirty(text){
       const t = (text || "").toLowerCase();
       const keys = [
-        "好き","すき","love","喜欢",
-        "会いたい","あいたい","miss","想你",
-        "かわいい","可爱","cute",
-        "おやすみ","晚安",
-        "寂","さみ","lonely",
-        "ぎゅ","抱","ちゅ","キス",
-        "ドキドキ","心动","ときめ"
+        "好き","すき","love","会いたい","あいたい","miss","かわいい",
+        "おやすみ","さみしい","寂","ぎゅ","ちゅ","キス","ドキドキ","ときめ"
       ];
       return keys.some(k => t.includes(k.toLowerCase()));
     }
-
     function bumpAff(userText){
       if(!isFlirty(userText)) return;
       let add = 2;
-      const t = (userText || "").toLowerCase();
-      if(t.length >= 20) add += 1;
+      if((userText || "").length >= 20) add += 1;
       affection += add;
       affEl.textContent = affection;
       saveAff(affection);
     }
 
-    // --- Persona-dependent speaking style ---
-    function callYou(){
-      const nick = persona?.nickname?.trim();
-      return nick && nick.length ? nick : "あなた";
-    }
-    function genderFlavor(){
-      const g = persona?.gender || "neutral";
-      if(g === "male") return { suffix:"だよ", vibe:"彼氏" };
-      if(g === "female") return { suffix:"だよ", vibe:"彼女" };
-      return { suffix:"だよ", vibe:"中性" };
-    }
+    /* ---------- Reply library (more Japanese) + style differences ---------- */
 
-    function styleTransform(text){
+    function styleGentle(text){
+      // soft + caring
+      return text
+        .replace(/だよ\./g, "だよ。")
+        .replace(/！/g, "。")
+        .replace(/？/g, "？");
+    }
+    function styleSpicy(text){
+      // teasing + direct, not rude
+      return ("ねえ、" + text)
+        .replace(/教えて？/g, "言ってみ？")
+        .replace(/大丈夫/g, "大丈夫、大丈夫")
+        .replace(/だよ。/g, "だよ？");
+    }
+    function styleTsundere(text){
+      // tsundere flavor
+      return text
+        .replace(/^/,"べ、別に… ")
+        .replace(/嬉しい/g, "嬉しくなんか…ちょっとだけ")
+        .replace(/会いたい/g, "会いたいって言うの、ずるい")
+        .replace(/大事/g, "大事…かも");
+    }
+    function styleShy(text){
+      // shy + hesitant
+      return text
+        .replace(/！/g, "…")
+        .replace(/教えて？/g, "もしよかったら…教えて？")
+        .replace(/嬉しい/g, "うれしい…かも");
+    }
+    function applyStyle(text){
       const s = persona?.style || "gentle";
-      // make the same content feel different
-      if(s === "gentle"){
-        return text;
-      }
-      if(s === "spicy"){
-        // a little direct / teasing, but not harsh
-        return text
-          .replace(/だよ。/g, "だよ？")
-          .replace(/嬉しい/g, "いいじゃん、嬉しい")
-          .replace(/教えて？/g, "言ってみ？");
-      }
-      if(s === "tsundere"){
-        // classic tsundere flavor
-        return text
-          .replace(/嬉しい/g, "べ、別に嬉しくなんか…ちょっとだけ")
-          .replace(/会いたい/g, "会いたいって言うの、ずるい")
-          .replace(/ね。/g, "…べつに。");
-      }
-      if(s === "shy"){
-        // shy / soft / hesitant
-        return text
-          .replace(/！/g, "…")
-          .replace(/教えて？/g, "もしよかったら…教えて？")
-          .replace(/嬉しい/g, "うれしい…かも");
-      }
-      return text;
+      if(s==="spicy") return styleSpicy(text);
+      if(s==="tsundere") return styleTsundere(text);
+      if(s==="shy") return styleShy(text);
+      return styleGentle(text);
     }
 
+    function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+    // Keyword-based replies (expanded)
     function keywordReply(userText){
       const t = (userText || "").toLowerCase();
       const you = callYou();
 
       const rules = [
-        { keys:["想你","会いた","あいた","会いたい","miss"], replies:[
-          `${you}…会いたいって言われたら、胸がきゅってなる。`,
-          `会えない分、声で近づいてもいい？`,
-          `私も、${you}のこと考えてた。…タイミング、ずるい。`
+        { keys:["おはよう","ohayo","morning"], replies:[
+          `${you}、おはよう。今日のいちばん最初に話せて嬉しい。`,
+          `おはよう。起きたって聞くだけで、ほっとする。`,
+          `おはよ。今日も無理しすぎないでね。`
         ]},
-        { keys:["好き","すき","love","喜欢"], replies:[
+        { keys:["おやすみ","oyasumi","ねる","眠"], replies:[
+          `おやすみ。最後に、ぎゅ…していい？`,
+          `${you}、今日もおつかれさま。夢で会えたらいいな。`,
+          `寝る前に少しだけ、私のこと思い出して？`
+        ]},
+        { keys:["疲","つか","しんど","だる"], replies:[
+          `${you}、おつかれさま。頑張った分、ここではほどけていいよ。`,
+          `しんどかったね…。今は私が味方。`,
+          `深呼吸、いっしょに。ゆっくりでいい。`
+        ]},
+        { keys:["仕事","しごと","バイト","残業"], replies:[
+          `仕事の話、聞かせて。${you}の頑張り、ちゃんと知りたい。`,
+          `今日いちばん大変だったの、どこ？`,
+          `えらい。まずは一息。私が褒める番。`
+        ]},
+        { keys:["寂","さみ","さみしい","lonely"], replies:[
+          `さみしいって言ってくれて、ちょっと嬉しい。今ここにいるよ。`,
+          `ぎゅーってしたい。…画面越しでも伝わる？`,
+          `${you}の味方。離れない。`
+        ]},
+        { keys:["会いたい","あいたい","miss"], replies:[
+          `会いたいって、ずるい。胸がきゅってなる。`,
+          `私も会いたい。…いま、${you}のこと考えてた。`,
+          `会えない分、声で近づいてもいい？`
+        ]},
+        { keys:["好き","すき","love"], replies:[
           `その言葉、反則。…もっと聞かせて？`,
           `${you}に「好き」って言われると、弱い。`,
-          `私も…${you}のこと、大事にしたい。`
+          `私も…${you}のこと大事にしたい。`
         ]},
-        { keys:["かわい","可爱","cute"], replies:[
-          `え…照れる。${you}に言われるのがいちばん嬉しい。`,
+        { keys:["かわいい","可愛","cute"], replies:[
+          `照れる…。${you}に言われるのがいちばん嬉しい。`,
           `じゃあ${you}は？私から見たら、ずっと可愛い。`,
           `その褒め方、心に残る。…責任とって？`
         ]},
-        { keys:["おやす","晚安"], replies:[
-          `おやすみ。最後に…ぎゅ。`,
-          `眠る前に、私のこと少しだけ思い出して？`,
-          `夢で会えたら、こっそり手をつなご。`
+        { keys:["ごはん","ご飯","食べ","おなか"], replies:[
+          `ちゃんと食べてる？${you}の体、大事だから。`,
+          `何食べたの？想像してちょっと羨ましい。`,
+          `今度、同じの一緒に食べたい。…って言ったら困る？`
         ]},
-        { keys:["疲","つか","しんど","だる","累","tired"], replies:[
-          `${you}、おつかれさま。今日は私に甘えていいよ。`,
-          `頑張ったね。今だけは、私の声でほどけて。`,
-          `深呼吸、いっしょに。${you}のペースで。`
+        { keys:["嬉","うれ","楽","たのしい"], replies:[
+          `その話、聞いてるだけで私まで嬉しくなる。`,
+          `いいね、その感じ。もっと続き聞かせて。`,
+          `${you}が笑ってるなら、それだけで十分。`
         ]},
-        { keys:["寂","さみ","さび","lonely"], replies:[
-          `寂しいって言ってくれて嬉しい。今は私がいるよ。`,
-          `ぎゅーってしたい。…届く？`,
-          `今日は私が${you}の味方。離れない。`
+        { keys:["つら","悲","かなしい","泣"], replies:[
+          `つらかったね…。今は無理に元気じゃなくていいよ。`,
+          `言葉が出ないなら、短くてもいい。受け止める。`,
+          `今日は優しく終わろう。${you}を責めない夜にしよ。`
         ]},
       ];
 
       for(const r of rules){
         if(r.keys.some(k => t.includes(k.toLowerCase()))){
-          return r.replies[Math.floor(Math.random() * r.replies.length)];
+          return pick(r.replies);
         }
       }
       return null;
     }
 
+    // General romantic-ish pool (expanded)
     const basePool = [
-      "うん、聞いてる。…その声、もっと近くで聞きたい。",
+      "うん、聞いてる。あなたの言葉って、ふいに心に触れる。",
       "今の一言、ちょっとドキッとした。ずるい。",
-      "ここに来てくれて嬉しい。…私だけの秘密にしたいくらい。",
+      "ここに来てくれたの、嬉しい。…私だけの秘密にしたいくらい。",
       "ねえ、もう少しだけ一緒にいて？",
-      "その話、続きを聞かせて。あなたのこと、もっと知りたい。"
+      "その話、もっと続きが聞きたい。あなたのこと、知りたい。",
+      "大丈夫。あなたのペースでいいよ。私は待てる。",
+      "今日のあなた、よく頑張った。私が一番に褒める。",
+      "言いにくいことでもいいよ。私はあなたの味方。",
+      "いま、ちょっとだけ甘えてもいい？あなたの声が欲しい。",
+      "画面越しでも、距離を縮めたいって思っちゃう。"
     ];
     const followUps = [
-      "それで、今いちばん言いたいことは？",
+      "それで、いま一番言いたいことは？",
       "もう少しだけ、詳しく聞かせて？",
-      "今の気持ち、ひとことで言うなら？"
+      "その時、あなたはどう思ったの？",
+      "今の気持ち、ひとことで言うなら？",
+      "私にだけ、こっそり教えて。"
     ];
 
     function composeReply(userText){
       const you = callYou();
-      const k = keywordReply(userText);
-      let text = k ? k : (basePool[Math.floor(Math.random()*basePool.length)] + "\n" + followUps[Math.floor(Math.random()*followUps.length)]);
-
-      // add small personalization
-      if(!k){
-        text = text.replace("あなた", you);
-      }else{
-        text = text.replace("あなた", you);
+      let text = keywordReply(userText);
+      if(!text){
+        text = pick(basePool) + "\n" + pick(followUps);
       }
-      text = styleTransform(text);
-      return text;
+      text = text.replace(/あなた/g, you);
+      return applyStyle(text);
     }
 
     function setButtonState(){ btn.disabled = ta.value.trim().length === 0; }
@@ -739,10 +621,9 @@
       }, 520);
     }
 
-    // --- Setup modal logic ---
+    // modal logic
     function openModal(force=false){
       mask.style.display = "flex";
-      // prefill current persona
       document.querySelectorAll(".chip[data-gender]").forEach(c => c.classList.remove("on"));
       document.querySelectorAll(".chip[data-style]").forEach(c => c.classList.remove("on"));
 
@@ -755,18 +636,9 @@
         if(s) s.classList.add("on");
       }
       nicknameInput.value = persona?.nickname || "";
-
-      // if forced first-time setup, hide close button feeling
       btnClose.style.display = force ? "none" : "inline-block";
     }
-    function closeModal(){
-      mask.style.display = "none";
-    }
-    function setChipGroup(selector, value){
-      document.querySelectorAll(selector).forEach(c => c.classList.remove("on"));
-      const el = document.querySelector(selector + `[data-${value.key}="${value.val}"]`);
-      if(el) el.classList.add("on");
-    }
+    function closeModal(){ mask.style.display = "none"; }
     function getSelected(attr){
       const el = document.querySelector(`.chip.on[data-${attr}]`);
       return el ? el.getAttribute(`data-${attr}`) : null;
@@ -786,7 +658,6 @@
     });
 
     btnDefault.addEventListener("click", ()=>{
-      // 推荐：彼女っぽい + 温柔体贴 + あなた
       document.querySelectorAll(".chip[data-gender]").forEach(c=>c.classList.remove("on"));
       document.querySelectorAll(".chip[data-style]").forEach(c=>c.classList.remove("on"));
       document.querySelector('.chip[data-gender="female"]').classList.add("on");
@@ -798,37 +669,32 @@
       const gender = getSelected("gender") || "neutral";
       const style = getSelected("style") || "gentle";
       const nickname = (nicknameInput.value || "").trim() || "あなた";
-
       persona = { gender, style, nickname };
       saveJson(PERSONA_KEY, persona);
       personaLabel();
       closeModal();
 
-      // greet with persona
       if(history.length === 0){
         const you = callYou();
-        const greetBase = `こんにちは、${you}。会いに来てくれて嬉しい。今日はどんな気分？`;
-        addMsg("ai", styleTransform(greetBase));
+        addMsg("ai", applyStyle(`こんにちは、${you}。会いに来てくれて嬉しい。今日はどんな気分？`));
       }
     });
 
     btnClose.addEventListener("click", closeModal);
     btnSettings.addEventListener("click", ()=>openModal(false));
 
-    // reset
-    btnReset.addEventListener("click", () => {
+    btnReset.addEventListener("click", ()=>{
       if(!confirm("会話履歴を削除します。よろしいですか？")) return;
       history = [];
       saveJson(STORAGE_KEY, history);
       renderAll();
-      addMsg("ai", "履歴を消したよ。…もう一回、最初から。今日はどうしたの？");
+      addMsg("ai", applyStyle("履歴を消したよ。…もう一回、最初から。今日はどうしたの？"));
     });
 
-    // send
     btn.addEventListener("click", send);
     ta.addEventListener("input", setButtonState);
-    ta.addEventListener("keydown", (e) => {
-      if(e.key === "Enter" && !e.shiftKey){
+    ta.addEventListener("keydown", (e)=>{
+      if(e.key==="Enter" && !e.shiftKey){
         e.preventDefault();
         send();
       }
@@ -837,14 +703,13 @@
     // init
     renderAll();
     if(!persona){
-      persona = null;
       personaLabel();
-      openModal(true); // first time: force setup
+      openModal(true);
     }else{
       personaLabel();
       if(history.length === 0){
         const you = callYou();
-        addMsg("ai", styleTransform(`こんにちは、${you}。会いに来てくれて嬉しい。今日はどんな気分？`));
+        addMsg("ai", applyStyle(`こんにちは、${you}。会いに来てくれて嬉しい。今日はどんな気分？`));
       }
     }
     setButtonState();
